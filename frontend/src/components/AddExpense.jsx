@@ -7,7 +7,7 @@ import Button from 'react-bootstrap/Button';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
-const AddExpense = () => {
+function AddExpense() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
@@ -69,6 +69,6 @@ const AddExpense = () => {
       </form>
     </Container>
   );
-};
+}
 
 export default AddExpense;
