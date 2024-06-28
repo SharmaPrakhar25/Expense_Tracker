@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id           Int            @id @default(autoincrement())
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @default(now())
+  name         String         @db.VarChar(255)
+  mobile       String
+  email        String         @db.VarChar(255)
+  user_expense user_expense[]
+  expense      expense[]
+}
+
+model expense {
+  id            Int            @id @default(autoincrement())
+  createdAt     DateTime       @default(now())
+  shared        Boolean        @default(false)
+  user          user           @relation(fields: [owner_user_id], references: [id])
+  owner_user_id Int
+  total_amount  Int
+  user_expense  user_expense[]
+  category      String?        @db.VarChar(255)
+}
+
+model user_expense {
+  expense             expense @relation(fields: [expense_id], references: [id])
+  user                user    @relation(fields: [shared_with_user_id], references: [id])
+  shared_with_user_id Int
+  expense_id          Int
+  shared_amount       Int
+
+  @@id([expense_id])
+}
