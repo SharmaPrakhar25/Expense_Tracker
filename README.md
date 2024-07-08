@@ -39,7 +39,7 @@ There are 2 ways to setup the backend server
    run docker-compose build
    ```
 5. ```
-   run docker compose-up -p expense_tracker_be up -d
+   run docker-compose -p expense_tracker_be up -d
    ```
 6. Check the docker hub, in some cases the backend application container doesn't start
 7. If the backend application container hasn't started properly run `docker-compose -p expense_tracker_be restart`
