@@ -25,7 +25,7 @@ function main() {
         yield prisma.$connect();
         // * typescript way of initiating the express constructor
         const app = (0, express_1.default)();
-        const server = new app_1.default(app);
+        new app_1.default(app);
         const port = process.env.PORT ? parseInt(process.env.PORT) : 8080;
         app.listen(port, () => {
             console.log(`[server]: Server is running at http://localhost:${port}`);
@@ -34,7 +34,7 @@ function main() {
 }
 main()
     .then(() => __awaiter(void 0, void 0, void 0, function* () {
-    yield prisma.$disconnect();
+    console.log("Application running successfully");
 }))
     .catch((e) => __awaiter(void 0, void 0, void 0, function* () {
     console.error(e);

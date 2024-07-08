@@ -4,8 +4,10 @@ import { expenseHelper } from "../db/helpers/expenseHelper";
 export const expenseController = {
   fetchUserExpense: async (req: Request, res: Response) => {
     try {
-      const { user_id: userId } = req.body;
-      const userExpense = await expenseHelper.fetchUserExpenses(userId);
+      const { user_id: userId } = req.params;
+      const userExpense = await expenseHelper.fetchUserExpenses(
+        parseInt(userId)
+      );
       return res.json(userExpense);
     } catch (error) {
       console.log(error);
@@ -24,9 +26,9 @@ export const expenseController = {
       const addExpense = await expenseHelper.addUserExpense(
         userId,
         amount,
-        category,
-        isShared,
-        sharedExpense
+        category
+        // isShared,
+        // sharedExpense
       );
       if (addExpense)
         return res.json({
