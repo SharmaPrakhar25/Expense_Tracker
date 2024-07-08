@@ -13,7 +13,7 @@ async function main() {
   await prisma.$connect();
   // * typescript way of initiating the express constructor
   const app: Application = express();
-  const server: Server = new Server(app);
+  new Server(app);
   const port: number = process.env.PORT ? parseInt(process.env.PORT) : 8080;
   app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
@@ -22,7 +22,7 @@ async function main() {
 
 main()
   .then(async () => {
-    await prisma.$disconnect();
+    console.log("Application running successfully");
   })
   .catch(async (e) => {
     console.error(e);
