@@ -1,14 +1,9 @@
 import React, { useState } from 'react';
-import { Col, Row, Container } from 'react-bootstrap';
-import FloatingLabel from 'react-bootstrap/FloatingLabel';
-import Form from 'react-bootstrap/Form';
 import DatePicker from 'react-datepicker';
-import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import 'react-datepicker/dist/react-datepicker.css';
-
-// eslint-disable-next-line import/no-unresolved
-import { terminal } from 'virtual:terminal';
+import { toast } from 'react-toastify';
+import DoughnutChart from './DoughnutChart';
 
 function AddExpense() {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -21,69 +16,118 @@ function AddExpense() {
       const expenseData = {
         user_id: 1,
         category,
-        amount: parseInt(price, 2),
-        // selectedDate,
+        amount: parseInt(price, 10),
+        // date: selectedDate ? selectedDate.toISOString().
+        // split('T')[0] : null, // Format date to YYYY-MM-DD
         is_shared: false,
       };
-      terminal.log(import.meta.env);
-      await axios.post(
-        `${import.meta.env.VITE_BACKEND_BASE_URL}/expense/add`,
-        // eslint-disable-next-line comma-dangle
-        expenseData
+      console.log(expenseData);
+      const response = await axios.post(
+        'http://localhost:8080/expense/add',
+        expenseData,
       );
-      // const { message } = response;
-      // Todo: show message back in toast bar
+
+      console.log(response.data);
+      toast.success(response.data.message);
+
+      // Todo: show success message back in toast bar
     } catch (error) {
-      throw new Error('something went wrong');
+      console.error('Error adding expense:', error);
+      toast.error(error.message);
+      // Todo: show error message back in toast bar
     }
   };
 
   return (
-    <Container>
-      <form onSubmit={handleSubmit}>
-        <Row className="mb-3">
-          <Col xs={12} md={6}>
-            <FloatingLabel controlId="floatingInput" label="Category">
-              <Form.Control
-                type="text"
-                placeholder="Category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-              />
-            </FloatingLabel>
-          </Col>
-          <Col xs={12} md={6}>
-            <FloatingLabel controlId="floatingInput" label="Price">
-              <Form.Control
-                type="text"
-                placeholder="Price"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-              />
-            </FloatingLabel>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs={12}>
+    <div className="flex  ">
+      {/* Left side (Table) */}
+      <div className="w-4/6 p-4">
+     
+        <h2 className="text-lg font-bold mb-4">Expense List</h2>
+        {/* Example table (replace with your own table component or data) */}
+        <table className="w-full border-collapse border border-gray-200">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border border-gray-200 px-4 py-2">Date</th>
+              <th className="border border-gray-200 px-4 py-2">Category</th>
+              <th className="border border-gray-200 px-4 py-2">Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {/* Example table row (replace with dynamic data) */}
+            <tr className="border-b border-gray-200">
+              <td className="border border-gray-200 px-4 py-2">2023-01-01</td>
+              <td className="border border-gray-200 px-4 py-2">Food</td>
+              <td className="border border-gray-200 px-4 py-2">$10.00</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div className='flex justify-center'>
+        <DoughnutChart />
+        </div>
+      </div>
+
+      {/* Right side (Form) */}
+      <div className="w-2/6 p-4">
+      <h2 className="text-lg font-bold mb-4">Add Expense</h2>
+        <form onSubmit={handleSubmit} className="grid gap-4">
+          <div className="mb-3">
+            <label className="block text-sm font-medium text-gray-700" htmlFor="category">
+              Category
+            </label>
+            <input
+              type="text"
+              id="category"
+              placeholder="Category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+          </div>
+          <div className="mb-3">
+            <label className="block text-sm font-medium text-gray-700" htmlFor="price">
+              Price
+            </label>
+            <input
+              type="text"
+              id="price"
+              placeholder="Price"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+          </div>
+          <div className="mb-3">
+            <label className="block text-sm font-medium text-gray-700">
+              Date
+            </label>
             <DatePicker
               selected={selectedDate}
               onChange={(date) => setSelectedDate(date)}
               dateFormat="MM/dd/yyyy"
-              customInput={<Form.Control />}
-              className="form-control"
-              placeholderText="Date"
+              customInput={(
+                <input
+                  type="text"
+                  className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  placeholder="Date"
+                />
+              )}
             />
-          </Col>
-        </Row>
-        <Row className="mt-3">
-          <Col>
-            <Button variant="primary" type="submit">
+          </div>
+          <div>
+            <button
+              type="submit"
+              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
               Submit
-            </Button>
-          </Col>
-        </Row>
-      </form>
-    </Container>
+            </button>
+          </div>
+        </form>
+       
+      
+      </div>
+    </div>
   );
 }
 
