@@ -5,9 +5,8 @@
 
 # Generate Prisma client
 npx prisma generate
+npx prisma migrate dev
 
-# Run Prisma migrations
-npx prisma migrate deploy
+npx prisma db seed
+node ./dist/server.js
 
-# Start the application
-npm start

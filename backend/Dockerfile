@@ -8,6 +8,8 @@ RUN npm install
 
 RUN npm run build
 
+RUN dos2unix ./dist/startup.sh && chmod +x ./dist/startup.sh
+
 ENV PORT=3001
 
-CMD ["sh", "./dist/startup.sh"]
+CMD ["sh", "./startup.sh"]

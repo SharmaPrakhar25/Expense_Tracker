@@ -43,6 +43,8 @@ export const expenseHelper = {
       shared: isShared === false,
     };
 
+    console.log(data);
+
     if (isShared && sharedExpense.length) {
       data.user_expense = {
         create: sharedExpense.map((user) => ({
