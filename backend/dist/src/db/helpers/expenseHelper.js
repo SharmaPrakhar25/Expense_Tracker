@@ -31,16 +31,16 @@ exports.expenseHelper = {
             });
         });
     },
-    addUserExpense: function (userId, amount, category, isShared = 0, sharedExpense) {
+    addUserExpense: function (userId, amount, category, isShared = false, sharedExpense = []) {
         return __awaiter(this, void 0, void 0, function* () {
             let data = {
                 total_amount: amount,
                 owner_user_id: userId,
                 // Assuming category is correctly handled according to your schema
                 category: category,
-                shared: isShared === 1,
+                shared: isShared === false,
             };
-            if (isShared === 1) {
+            if (isShared && sharedExpense.length) {
                 data.user_expense = {
                     create: sharedExpense.map((user) => ({
                         shared_with_user_id: user.user_id,
@@ -51,7 +51,7 @@ exports.expenseHelper = {
             return yield prisma.expense.create({
                 data: data,
                 include: {
-                    user_expense: true,
+                    user_expense: isShared,
                 },
             });
         });
