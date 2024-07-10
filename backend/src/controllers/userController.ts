@@ -3,7 +3,7 @@ import {
   addUser as addUserHelper,
   fetchUser as fetchUserHelper,
 } from "../db/helpers/userHelper";
-import { Code, IApiResponse } from "../../interfaces/response.interface";
+import { Code, IApiResponse } from "../../types";
 
 export async function addUser(req: Request, res: Response) {
   try {

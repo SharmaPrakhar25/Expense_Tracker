@@ -1,14 +1,30 @@
 import e, { Request, Response } from "express";
 import {
   fetchUserExpense as fetchUserExpenseHelper,
-  addUserExpense as addUserExpenseHeloer,
+  addUserExpense as addUserExpenseHelper,
 } from "../db/helpers/expenseHelper";
-import { Code, IApiResponse } from "../../interfaces/response.interface";
+import { Code, Expense, FetchExpenseQuery, IApiResponse } from "../../types";
 
 export async function fetchUserExpense(req: Request, res: Response) {
   try {
     const { userId } = req.params;
-    const userExpense = await fetchUserExpenseHelper(parseInt(userId));
+    const {
+      sort_by: sortBy,
+      sort_type: sortType,
+      category,
+      shared,
+    } = req.query;
+
+    const query: FetchExpenseQuery = {
+      ...(userId && { userId: parseInt(userId as string) }),
+      ...(sortBy && { sortBy: String(sortBy) }),
+      ...(sortType && { sortType: String(sortType) }),
+      ...(category && { category: String(category) }),
+      // ...(expenseId && { expenseId: parseInt(expenseId as string) }),
+      ...(shared && { shared: String(shared) }),
+    };
+
+    const userExpense = await fetchUserExpenseHelper(query);
     const successResponse: IApiResponse = {
       status: "SUCCESS",
       code: Code.SUCCESS,
@@ -36,15 +52,19 @@ export async function addUserExpense(req: Request, res: Response) {
       amount,
       is_shared: isShared,
       user_expense: sharedExpense,
+      created_at,
     } = req.body;
 
-    await addUserExpenseHeloer(
-      userId,
-      amount,
+    const expense: Expense = {
+      owner_user_id: userId,
       category,
-      isShared,
-      sharedExpense
-    );
+      total_amount: amount,
+      shared: isShared,
+      user_expense: sharedExpense,
+      ...(created_at && { createdAt: new Date(created_at) }),
+    };
+
+    await addUserExpenseHelper(expense);
     const successResponse: IApiResponse = {
       status: "SUCCESS",
       code: Code.CREATED,

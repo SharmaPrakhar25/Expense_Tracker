@@ -1,7 +1,7 @@
 // userHelper.ts
 
 import { PrismaClient } from "@prisma/client";
-import { User } from "../../../interfaces/user.interface"; // Adjust the import paths as necessary
+import { User } from "../../../types"; // Adjust the import paths as necessary
 
 const prisma = new PrismaClient();
 
