@@ -1,9 +1,5 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import {
-  Expense,
-  FetchExpenseQuery,
-  SharedUserExpenseInterface,
-} from "../../../types";
+import { Expense, FetchExpenseQuery } from "../../../types";
 
 const prisma = new PrismaClient();
 
