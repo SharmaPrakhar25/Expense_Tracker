@@ -18,7 +18,7 @@ const userController_1 = require("../controllers/userController");
 exports.userRouter = express_1.default.Router();
 exports.userRouter.post("/user", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield userController_1.userController.addUser(req, res);
+        yield (0, userController_1.addUser)(req, res);
     }
     catch (error) {
         console.log(error);

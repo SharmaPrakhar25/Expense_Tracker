@@ -9,33 +9,58 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.expenseController = void 0;
+exports.fetchUserExpense = fetchUserExpense;
+exports.addUserExpense = addUserExpense;
 const expenseHelper_1 = require("../db/helpers/expenseHelper");
-exports.expenseController = {
-    fetchUserExpense: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const response_interface_1 = require("../../interfaces/response.interface");
+function fetchUserExpense(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { user_id: userId } = req.body;
-            const userExpense = yield expenseHelper_1.expenseHelper.fetchUserExpenses(userId);
-            return res.json(userExpense);
+            const { user_id: userId } = req.params;
+            const userExpense = yield (0, expenseHelper_1.fetchUserExpense)(parseInt(userId));
+            console.log(userExpense);
+            const successResponse = {
+                status: "SUCCESS",
+                code: response_interface_1.Code.SUCCESS,
+                message: "Expense fetched successfully",
+                data: userExpense,
+            };
+            return res.status(response_interface_1.Code.SUCCESS).json(successResponse);
         }
         catch (error) {
-            console.log(error);
-            return res.status(500).json(error);
+            const errorResponse = {
+                status: "ERROR",
+                code: response_interface_1.Code.BAD_REQUEST,
+                message: "Something went wrong",
+                error,
+            };
+            return res.status(response_interface_1.Code.BAD_REQUEST).json(errorResponse);
         }
-    }),
-    addUserExpense: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    });
+}
+function addUserExpense(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
         try {
             const { user_id: userId, category, amount, is_shared: isShared, user_expense: sharedExpense, } = req.body;
-            const addExpense = yield expenseHelper_1.expenseHelper.addUserExpense(userId, amount, category, isShared, sharedExpense);
-            if (addExpense)
-                return res.json({
-                    message: "expense added successfully",
-                });
+            const addExpense = yield (0, expenseHelper_1.addUserExpense)(userId, amount, category
+            // isShared,
+            // sharedExpense
+            );
+            const successResponse = {
+                status: "SUCCESS",
+                code: response_interface_1.Code.CREATED,
+                message: "Expense added successfully",
+            };
+            return res.status(response_interface_1.Code.CREATED).json(successResponse);
         }
         catch (error) {
-            console.log("error in controller");
-            console.log(error);
-            return res.status(500).json(error);
+            const errorResponse = {
+                status: "ERROR",
+                code: response_interface_1.Code.BAD_REQUEST,
+                message: "Something went wrong, Failed to save expense",
+                error,
+            };
+            return res.status(response_interface_1.Code.BAD_REQUEST).json(errorResponse);
         }
-    }),
-};
+    });
+}

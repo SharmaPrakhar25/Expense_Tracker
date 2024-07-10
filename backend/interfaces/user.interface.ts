@@ -6,15 +6,9 @@ export interface User {
   mobile: string;
 }
 
-export type UnitUser = Pick<User, "id">;
-export interface Users {
-  [key: string]: User;
-}
 export interface UserExpenseInterface {
-  user_id: string;
-  sharedAmount: number;
+  user_id: number;
+  shared_amount: number;
 }
-
-export type UserWithoutPassword = Omit<User, "password">;
 
 export type SharedUserExpenseInterface = UserExpenseInterface[];

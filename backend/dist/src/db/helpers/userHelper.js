@@ -1,4 +1,5 @@
 "use strict";
+// userHelper.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -9,11 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userHelper = void 0;
+exports.fetchUser = exports.addUser = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
-exports.userHelper = {
-    addUser: (userObj) => __awaiter(void 0, void 0, void 0, function* () {
+const addUser = (userObj) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
         return yield prisma.user.create({
             data: {
                 name: userObj.name,
@@ -21,9 +22,15 @@ exports.userHelper = {
                 email: userObj.email,
             },
         });
-    }),
-    fetchUser: (userId) => __awaiter(void 0, void 0, void 0, function* () {
-        const user = yield prisma.user.findFirst({
+    }
+    catch (error) {
+        throw new Error("Failed to save user in database");
+    }
+});
+exports.addUser = addUser;
+const fetchUser = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return yield prisma.user.findFirst({
             select: {
                 email: true,
                 name: true,
@@ -33,6 +40,9 @@ exports.userHelper = {
                 id: userId,
             },
         });
-        return user;
-    }),
-};
+    }
+    catch (error) {
+        throw new Error("Failed to fetch user from database");
+    }
+});
+exports.fetchUser = fetchUser;

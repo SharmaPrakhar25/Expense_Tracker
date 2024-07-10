@@ -1,60 +1,83 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import {
-  SharedUserExpenseInterface,
-  UserExpenseInterface,
-  UserWithoutPassword,
-} from "../../interfaces/user.interface";
+import { SharedUserExpenseInterface } from "../../../interfaces/user.interface";
+
 const prisma = new PrismaClient();
 
-export const expenseHelper = {
-  fetchUserExpenses: async function (userId: number, expenseId?: number) {
-    let whereCondition: {
-      user_id: number;
-      [key: string]: number;
-    } = {
-      user_id: userId,
+export async function fetchUserExpense(userId: number, expenseId?: number) {
+  try {
+    let expenseIdArray: Array<number> = [];
+    if (expenseId) {
+      expenseIdArray = [expenseId];
+    }
+    const whereCondition: any = {
+      OR: [{ owner_user_id: userId }],
     };
 
-    if (expenseId !== undefined) {
-      whereCondition["expense_id"] = expenseId;
-    }
-
-    return await prisma.expense.findMany({
-      relationLoadStrategy: "join",
-      // include: {
-      //   user_expense: {
-      //     where: whereCondition,
-      //   },
-      // },
-    });
-  },
-  addUserExpense: async function (
-    userId: number,
-    amount: number,
-    category: string,
-    isShared: boolean = false,
-    sharedExpense: SharedUserExpenseInterface = []
-  ) {
-    let data: any = {
-      total_amount: amount,
-      owner_user_id: userId,
-      category: category.toLowerCase(),
-      shared: isShared === false,
-    };
-
-    if (isShared && sharedExpense.length) {
-      data.user_expense = {
-        create: sharedExpense.map((user) => ({
-          shared_with_user_id: user.user_id,
-          shared_amount: user.sharedAmount,
-        })),
-      };
-    }
-    return await prisma.expense.create({
-      data: data,
-      include: {
-        user_expense: isShared,
+    // Fetch user_expense records separately based on shared_with_user_id
+    const sharedUserExpenses = await prisma.user_expense.findMany({
+      where: {
+        shared_with_user_id: userId,
+      },
+      select: {
+        expense_id: true,
       },
     });
-  },
-};
+
+    if (sharedUserExpenses) {
+      for (let expense of sharedUserExpenses) {
+        expenseIdArray.push(expense.expense_id);
+      }
+    }
+
+    if (expenseIdArray.length > 0) {
+      whereCondition.OR.push({
+        id: {
+          in: expenseIdArray,
+        },
+      });
+    }
+
+    const expenses = await prisma.expense.findMany({
+      where: whereCondition,
+      include: {
+        user_expense: true,
+      },
+    });
+
+    return expenses;
+  } catch (error) {
+    return error;
+  }
+}
+
+export async function addUserExpense(
+  userId: number,
+  amount: number,
+  category: string,
+  isShared: boolean = false,
+  sharedExpense: SharedUserExpenseInterface = []
+) {
+  try {
+    const data: Prisma.expenseCreateInput = {
+      shared: isShared,
+      total_amount: amount,
+      category: category.toLowerCase(),
+      user: {
+        connect: { id: userId },
+      },
+      user_expense: isShared
+        ? {
+            create: sharedExpense.map((sE) => ({
+              shared_amount: sE.shared_amount,
+              user: { connect: { id: sE.user_id } },
+            })),
+          }
+        : undefined,
+    };
+    return await prisma.expense.create({
+      data,
+    });
+  } catch (error) {
+    return error;
+  }
+}

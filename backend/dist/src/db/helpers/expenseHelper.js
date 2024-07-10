@@ -9,51 +9,57 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.expenseHelper = void 0;
+exports.fetchUserExpense = fetchUserExpense;
+exports.addUserExpense = addUserExpense;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
-exports.expenseHelper = {
-    fetchUserExpenses: function (userId, expenseId) {
-        return __awaiter(this, void 0, void 0, function* () {
+function fetchUserExpense(userId, expenseId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
             let whereCondition = {
                 user_id: userId,
             };
             if (expenseId !== undefined) {
-                whereCondition["expense_id"] = expenseId;
+                whereCondition["id"] = expenseId;
             }
             return yield prisma.expense.findMany({
+                where: whereCondition,
                 relationLoadStrategy: "join",
-                // include: {
-                //   user_expense: {
-                //     where: whereCondition,
-                //   },
-                // },
             });
-        });
-    },
-    addUserExpense: function (userId, amount, category, isShared = false, sharedExpense = []) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let data = {
+        }
+        catch (error) {
+            throw new Error("Failed to fetch user expense");
+        }
+    });
+}
+function addUserExpense(userId_1, amount_1, category_1) {
+    return __awaiter(this, arguments, void 0, function* (userId, amount, category, isShared = false, sharedExpense = []) {
+        try {
+            const data = {
+                shared: isShared,
                 total_amount: amount,
-                owner_user_id: userId,
-                // Assuming category is correctly handled according to your schema
-                category: category,
-                shared: isShared === false,
+                category: category.toLowerCase(),
+                user: {
+                    connect: { id: userId },
+                },
+                user_expense: isShared
+                    ? {
+                        create: sharedExpense.map((user) => ({
+                            shared_amount: user.sharedAmount,
+                            user: { connect: { id: user.user_id } },
+                        })),
+                    }
+                    : undefined,
             };
-            if (isShared && sharedExpense.length) {
-                data.user_expense = {
-                    create: sharedExpense.map((user) => ({
-                        shared_with_user_id: user.user_id,
-                        shared_amount: user.sharedAmount,
-                    })),
-                };
-            }
             return yield prisma.expense.create({
                 data: data,
                 include: {
                     user_expense: isShared,
                 },
             });
-        });
-    },
-};
+        }
+        catch (error) {
+            throw new Error("Failed to add user expense");
+        }
+    });
+}

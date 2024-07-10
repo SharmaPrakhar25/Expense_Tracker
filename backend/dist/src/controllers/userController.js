@@ -9,25 +9,54 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userController = void 0;
+exports.addUser = addUser;
+exports.fetchUser = fetchUser;
 const userHelper_1 = require("../db/helpers/userHelper");
-exports.userController = {
-    addUser(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
+const response_interface_1 = require("../../interfaces/response.interface");
+function addUser(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
             const { user: userObj } = req.body;
-            const saveUser = yield userHelper_1.userHelper.addUser(userObj);
-            return res.json({
-                name: userObj.name,
-                email: userObj.email,
-                mobile: userObj.mobile,
-            });
-        });
-    },
-    fetchUser(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
+            yield (0, userHelper_1.addUser)(userObj);
+            const successResponse = {
+                status: "SUCCESS",
+                code: response_interface_1.Code.SUCCESS,
+                message: "User created successfully",
+            };
+            return res.status(response_interface_1.Code.CREATED).json(successResponse);
+        }
+        catch (error) {
+            const errorResponse = {
+                status: "ERROR",
+                code: response_interface_1.Code.BAD_REQUEST,
+                message: "Something went wrong",
+                error,
+            };
+            return res.status(response_interface_1.Code.BAD_REQUEST).json(errorResponse);
+        }
+    });
+}
+function fetchUser(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
             const { user_id: userId } = req.body;
-            const user = yield userHelper_1.userHelper.fetchUser(userId);
-            return res.json(user);
-        });
-    },
-};
+            const user = yield (0, userHelper_1.fetchUser)(userId);
+            const successResponse = {
+                status: "SUCCESS",
+                code: response_interface_1.Code.SUCCESS,
+                message: "User fetched successfully",
+                data: user,
+            };
+            return res.status(response_interface_1.Code.SUCCESS).json(successResponse);
+        }
+        catch (error) {
+            const errorResponse = {
+                status: "ERROR",
+                code: response_interface_1.Code.BAD_REQUEST,
+                message: "Something went wrong",
+                error,
+            };
+            return res.status(response_interface_1.Code.BAD_REQUEST).json(errorResponse);
+        }
+    });
+}
