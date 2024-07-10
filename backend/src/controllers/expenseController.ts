@@ -23,6 +23,7 @@ export const expenseController = {
         is_shared: isShared,
         user_expense: sharedExpense,
       } = req.body;
+
       const addExpense = await expenseHelper.addUserExpense(
         userId,
         amount,

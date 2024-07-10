@@ -38,12 +38,9 @@ export const expenseHelper = {
     let data: any = {
       total_amount: amount,
       owner_user_id: userId,
-      // Assuming category is correctly handled according to your schema
-      category: category,
+      category: category.toLowerCase(),
       shared: isShared === false,
     };
-
-    console.log(data);
 
     if (isShared && sharedExpense.length) {
       data.user_expense = {
