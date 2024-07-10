@@ -1,40 +1,26 @@
+/* eslint-disable no-shadow */
+/* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
-import axios from 'axios';
 import 'react-datepicker/dist/react-datepicker.css';
-import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { AddExpenseRequest } from '../redux/Reducers/AddExpenseSlice'; // Update the path to your slice file
 
 function AddExpense() {
-  const [selectedDate, setSelectedDate] = useState(null);
+  const dispatch = useDispatch();
   const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
+  const [date, setDate] = useState(null);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      const expenseData = {
-        user_id: 1,
-        category,
-        amount: parseInt(price, 10),
-        // date: selectedDate ? selectedDate.toISOString().
-        // split('T')[0] : null, // Format date to YYYY-MM-DD
-        is_shared: false,
-      };
-      console.log(expenseData);
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_BASE_URL}/expense/add`,
-        expenseData,
-      );
-
-      console.log(response.data);
-      toast.success(response.data.message);
-
-      // Todo: show success message back in toast bar
-    } catch (error) {
-      console.error('Error adding expense:', error);
-      toast.error(error.message);
-      // Todo: show error message back in toast bar
-    }
+    dispatch(AddExpenseRequest({
+      user_id: 1,
+      category,
+      amount: parseInt(price, 10),
+      date: date ? date.toISOString().split('T')[0] : null,
+      is_shared: false,
+    }));
   };
 
   return (
@@ -72,8 +58,8 @@ function AddExpense() {
             Date
           </label>
           <DatePicker
-            selected={selectedDate}
-            onChange={(date) => setSelectedDate(date)}
+            selected={date}
+            onChange={(date) => setDate(date)}
             dateFormat="MM/dd/yyyy"
             customInput={(
               <input
@@ -93,9 +79,7 @@ function AddExpense() {
           </button>
         </div>
       </form>
-
     </>
-
   );
 }
 

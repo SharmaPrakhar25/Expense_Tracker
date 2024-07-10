@@ -1,19 +1,23 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+ 
 
 function ExpenseTable() {
   const [expenses, setExpenses] = useState([]);
+ 
 
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_BACKEND_BASE_URL}/expense/1/fetchExpense`)
-      .then((res) => {
-        setExpenses(res.data);
-        console.log(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_BASE_URL}/expense/1/fetchExpense`);
+        // eslint-disable-next-line max-len
+        setExpenses(response.data); // Assuming setExpenses updates Redux state with fetched expenses
+      } catch (error) {
+        console.error('Error fetching expenses:', error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   // Function to generate random background colors
