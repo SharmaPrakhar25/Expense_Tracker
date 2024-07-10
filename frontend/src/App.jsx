@@ -1,12 +1,16 @@
-import React from 'react'
-import Mainpage from './pages/Mainpage'
+import React from 'react';
+import { ToastContainer } from 'react-toastify';
+import Mainpage from './pages/Mainpage';
+import 'react-toastify/dist/ReactToastify.css';
 
-const App = () => {
+function App() {
   return (
     <div>
+      <ToastContainer />
       <Mainpage />
+
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -1,12 +1,12 @@
-import React from 'react'
-import AddExpense from '../components/AddExpense'
+import React from 'react';
+import AddExpense from '../components/AddExpense';
 
-const Mainpage = () => {
+function Mainpage() {
   return (
     <div>
       <AddExpense />
     </div>
-  )
+  );
 }
 
-export default Mainpage
+export default Mainpage;
