@@ -65,15 +65,18 @@ function DoughnutChart() {
   };
 
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_BACKEND_BASE_URL}/expense/1/`)
-      .then((res) => {
-        setExpenses(res.data);
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_BASE_URL}/expense/1/`);
+        const { data: expenseData } = response.data;
+        setExpenses(expenseData);
         processChartData();
-      })
-      .catch((err) => {
-        toast(err);
-      });
+      } catch (error) {
+        toast.error('Failed to fetch expenses. Please try again later.');
+      }
+    };
+
+    fetchData();
   }, []);
 
   const options = {
