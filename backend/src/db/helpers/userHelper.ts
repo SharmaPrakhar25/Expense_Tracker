@@ -1,10 +1,12 @@
+// userHelper.ts
+
 import { PrismaClient } from "@prisma/client";
+import { User } from "../../../types"; // Adjust the import paths as necessary
+
 const prisma = new PrismaClient();
 
-import { User, UserWithoutPassword } from "../../interfaces/user.interface";
-
-export const userHelper = {
-  addUser: async (userObj: User) => {
+export const addUser = async (userObj: User) => {
+  try {
     return await prisma.user.create({
       data: {
         name: userObj.name,
@@ -12,9 +14,14 @@ export const userHelper = {
         email: userObj.email,
       },
     });
-  },
-  fetchUser: async (userId: number): Promise<UserWithoutPassword | null> => {
-    const user = await prisma.user.findFirst({
+  } catch (error) {
+    throw new Error("Failed to save user in database");
+  }
+};
+
+export const fetchUser = async (userId: number) => {
+  try {
+    return await prisma.user.findFirst({
       select: {
         email: true,
         name: true,
@@ -24,7 +31,7 @@ export const userHelper = {
         id: userId,
       },
     });
-
-    return user as UserWithoutPassword | null;
-  },
+  } catch (error) {
+    throw new Error("Failed to fetch user from database");
+  }
 };

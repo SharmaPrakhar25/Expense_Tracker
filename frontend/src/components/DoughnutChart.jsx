@@ -4,6 +4,7 @@ import {
   Chart as ChartJS, ArcElement, Tooltip, Legend,
 } from 'chart.js';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -11,32 +12,18 @@ function DoughnutChart() {
   const [expenses, setExpenses] = useState([]);
   const [chartData, setChartData] = useState({
     label: [],
-    datasets: [{
-      label: 'Expense Distribution',
-      data: [],
-      backgroundColor: [],
-      hoverOffset: 4,
-    }],
+    datasets: [
+      {
+        label: 'Expense Distribution',
+        data: [],
+        backgroundColor: [],
+        hoverOffset: 4,
+      },
+    ],
   });
 
-  console.log(chartData);
-
-  useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_BACKEND_BASE_URL}/expense/1/fetchExpense`)
-      .then((res) => {
-        setExpenses(res.data);
-        console.log(res.data);
-        processChartData(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
-
-  const processChartData = (expenses) => {
+  const processChartData = () => {
     const categoryMap = {};
-
     const backgroundColors = [
       'rgb(255, 99, 132)',
       'rgb(54, 162, 235)',
@@ -60,18 +47,35 @@ function DoughnutChart() {
     // console.log(categoryMap)
     const labels = Object.keys(categoryMap);
     const data = Object.values(categoryMap);
-    const colors = labels.map((_, index) => backgroundColors[index % backgroundColors.length]);
+    const colors = labels.map(
+      (_, index) => backgroundColors[index % backgroundColors.length],
+    );
 
     setChartData({
       labels,
-      datasets: [{
-        label: 'Expense Distribution',
-        data,
-        backgroundColor: colors,
-        hoverOffset: 4,
-      }],
+      datasets: [
+        {
+          label: 'Expense Distribution',
+          data,
+          backgroundColor: colors,
+          hoverOffset: 4,
+        },
+      ],
     });
   };
+
+  useEffect(() => {
+    axios
+      .get(`${import.meta.env.VITE_BACKEND_BASE_URL}/expense/1/`)
+      .then((res) => {
+        setExpenses(res.data);
+        processChartData();
+      })
+      .catch((err) => {
+        toast(err);
+      });
+  }, []);
+
   const options = {
     responsive: true,
     plugins: {
@@ -90,7 +94,9 @@ function DoughnutChart() {
 
   return (
     <div className="w-full p-4 md:w-1/2 ">
-      <h2 className="text-lg flex justify-center font-bold mb-4">Expense Distribution</h2>
+      <h2 className="text-lg flex justify-center font-bold mb-4">
+        Expense Distribution
+      </h2>
       <Doughnut data={chartData} options={options} />
     </div>
   );

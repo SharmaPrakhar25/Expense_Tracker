@@ -1,63 +1,97 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import {
-  SharedUserExpenseInterface,
-  UserExpenseInterface,
-  UserWithoutPassword,
-} from "../../interfaces/user.interface";
+import { Expense, FetchExpenseQuery } from "../../../types";
+
 const prisma = new PrismaClient();
 
-export const expenseHelper = {
-  fetchUserExpenses: async function (userId: number, expenseId?: number) {
-    let whereCondition: {
-      user_id: number;
-      [key: string]: number;
-    } = {
-      user_id: userId,
+export async function fetchUserExpense(query: FetchExpenseQuery) {
+  try {
+    const { expenseId, userId, sortBy, sortType, category, shared } = query;
+    let expenseIdArray: Array<number> = [];
+    if (expenseId) {
+      expenseIdArray = [expenseId];
+    }
+    const whereCondition: any = {
+      AND: [{ owner_user_id: userId }],
     };
 
-    if (expenseId !== undefined) {
-      whereCondition["expense_id"] = expenseId;
+    if (category) {
+      whereCondition.category = category.toLowerCase();
     }
 
-    return await prisma.expense.findMany({
-      relationLoadStrategy: "join",
-      // include: {
-      //   user_expense: {
-      //     where: whereCondition,
-      //   },
-      // },
-    });
-  },
-  addUserExpense: async function (
-    userId: number,
-    amount: number,
-    category: string,
-    isShared: boolean = false,
-    sharedExpense: SharedUserExpenseInterface = []
-  ) {
-    let data: any = {
-      total_amount: amount,
-      owner_user_id: userId,
-      // Assuming category is correctly handled according to your schema
-      category: category,
-      shared: isShared === false,
-    };
-
-    console.log(data);
-
-    if (isShared && sharedExpense.length) {
-      data.user_expense = {
-        create: sharedExpense.map((user) => ({
-          shared_with_user_id: user.user_id,
-          shared_amount: user.sharedAmount,
-        })),
-      };
+    if (shared !== undefined) {
+      whereCondition.shared = shared === "true";
     }
-    return await prisma.expense.create({
-      data: data,
-      include: {
-        user_expense: isShared,
+
+    // Fetch user_expense records separately based on shared_with_user_id
+    const sharedUserExpenses = await prisma.user_expense.findMany({
+      where: {
+        shared_with_user_id: userId,
+      },
+      select: {
+        expense_id: true,
       },
     });
-  },
-};
+
+    if (sharedUserExpenses) {
+      for (let expense of sharedUserExpenses) {
+        expenseIdArray.push(expense.expense_id);
+      }
+    }
+
+    if (expenseIdArray.length > 0) {
+      whereCondition.AND.push({
+        id: {
+          in: expenseIdArray,
+        },
+      });
+    }
+
+    const orderByClause: any = [];
+    if (sortBy && sortType) {
+      orderByClause.push({
+        [sortBy]: sortType,
+      });
+    }
+
+    const expenses = await prisma.expense.findMany({
+      where: whereCondition,
+      include: {
+        user_expense: true,
+      },
+      orderBy: orderByClause.length > 0 ? orderByClause : undefined,
+    });
+
+    return expenses;
+  } catch (error) {
+    return error;
+  }
+}
+
+export async function addUserExpense(expense: Expense) {
+  try {
+    const data: Prisma.expenseCreateInput = {
+      shared: expense.shared,
+      total_amount: expense.total_amount,
+      category: expense.category.toLowerCase(),
+      user: {
+        connect: { id: expense.owner_user_id },
+      },
+      createdAt: expense.createdAt,
+      user_expense:
+        expense.shared && expense.user_expense
+          ? {
+              create: expense.user_expense.map((user) => ({
+                shared_amount: user.shared_amount,
+                user: { connect: { id: user.user_id } },
+              })),
+            }
+          : undefined,
+    };
+    console.log("data to save in database", data);
+    return await prisma.expense.create({
+      data,
+    });
+  } catch (error) {
+    return error;
+  }
+}
