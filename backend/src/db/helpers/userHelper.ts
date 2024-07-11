@@ -9,9 +9,9 @@ export const addUser = async (userObj: User) => {
   try {
     return await prisma.user.create({
       data: {
-        name: userObj.name,
+        ...(userObj.name && { name: userObj.name }),
         mobile: userObj.mobile,
-        email: userObj.email,
+        ...(userObj.email && { email: userObj.email }),
       },
     });
   } catch (error) {
