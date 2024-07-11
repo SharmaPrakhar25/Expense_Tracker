@@ -1,9 +1,9 @@
 // src/store/reducers.js
-import { combineReducers } from "@reduxjs/toolkit";
-import AddExpenseReducer from "./AddExpenseSlice"
+import { combineReducers } from '@reduxjs/toolkit';
+import AddExpenseReducer from './AddExpenseSlice';
 
 const rootReducer = combineReducers({
-  AddExpense : AddExpenseReducer
+  AddExpense: AddExpenseReducer,
 });
 
 export default rootReducer;

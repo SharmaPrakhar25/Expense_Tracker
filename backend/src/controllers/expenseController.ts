@@ -31,6 +31,7 @@ export async function fetchUserExpense(req: Request, res: Response) {
       message: "Expense fetched successfully",
       data: userExpense,
     };
+    console.log(userExpense);
     return res.status(Code.SUCCESS).json(successResponse);
   } catch (error) {
     console.log(error);
@@ -63,6 +64,8 @@ export async function addUserExpense(req: Request, res: Response) {
       user_expense: sharedExpense,
       ...(created_at && { createdAt: new Date(created_at) }),
     };
+
+    console.log(expense);
 
     await addUserExpenseHelper(expense);
     const successResponse: IApiResponse = {

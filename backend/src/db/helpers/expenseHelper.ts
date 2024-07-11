@@ -38,7 +38,6 @@ export async function fetchUserExpense(query: FetchExpenseQuery) {
       }
     }
 
-    console.log(whereCondition);
     if (expenseIdArray.length > 0) {
       whereCondition.AND.push({
         id: {
@@ -53,8 +52,6 @@ export async function fetchUserExpense(query: FetchExpenseQuery) {
         [sortBy]: sortType,
       });
     }
-
-    console.log(orderByClause);
 
     const expenses = await prisma.expense.findMany({
       where: whereCondition,
@@ -79,6 +76,7 @@ export async function addUserExpense(expense: Expense) {
       user: {
         connect: { id: expense.owner_user_id },
       },
+      createdAt: expense.createdAt,
       user_expense:
         expense.shared && expense.user_expense
           ? {
@@ -89,6 +87,7 @@ export async function addUserExpense(expense: Expense) {
             }
           : undefined,
     };
+    console.log("data to save in database", data);
     return await prisma.expense.create({
       data,
     });

@@ -5,5 +5,5 @@ import {
 } from "../controllers/expenseController";
 
 export const expenseRouter = express.Router();
-expenseRouter.post("/expense", addUserExpense);
+expenseRouter.post("/", addUserExpense);
 expenseRouter.get("/:userId", fetchUserExpense);
