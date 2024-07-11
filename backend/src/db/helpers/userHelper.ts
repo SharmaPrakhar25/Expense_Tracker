@@ -19,7 +19,10 @@ export const addUser = async (userObj: User) => {
   }
 };
 
-export const fetchUser = async (userId: number) => {
+export const fetchUser = async (
+  userId: number | null,
+  mobile: string | null
+) => {
   try {
     return await prisma.user.findFirst({
       select: {
@@ -28,7 +31,10 @@ export const fetchUser = async (userId: number) => {
         mobile: true,
       },
       where: {
-        id: userId,
+        OR: [
+          ...(userId ? [{ id: userId }] : []),
+          ...(mobile ? [{ mobile: mobile }] : []),
+        ],
       },
     });
   } catch (error) {
