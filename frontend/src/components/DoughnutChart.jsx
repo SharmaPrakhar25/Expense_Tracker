@@ -3,15 +3,13 @@ import { Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS, ArcElement, Tooltip, Legend,
 } from 'chart.js';
-import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
-import { GetExpenseRequest } from '../redux/Reducers/GetExpenseSlice';
+import { useSelector } from 'react-redux';
+ 
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function DoughnutChart() {
-  const dispatch = useDispatch();
-  const [chartData, setChartData] = useState({
+   const [chartData, setChartData] = useState({
     labels: [],
     datasets: [
       {
@@ -69,9 +67,7 @@ function DoughnutChart() {
 
   const { expense } = useSelector((state) => state.GetExpense);
 
-  useEffect(() => {
-    dispatch(GetExpenseRequest());
-  }, [dispatch]);
+ 
 
   useEffect(() => {
     processChartData(expense);

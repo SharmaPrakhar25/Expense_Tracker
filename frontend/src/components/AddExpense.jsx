@@ -6,8 +6,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useDispatch } from 'react-redux';
 import { AddExpenseRequest } from '../redux/Reducers/AddExpenseSlice'; // Update the path to your slice file
-import { GetExpenseRequest } from '../redux/Reducers/GetExpenseSlice';
-
+ 
 const MemoizedInput = React.memo(
   ({
     // eslint-disable-next-line react/prop-types
@@ -59,7 +58,7 @@ function AddExpense() {
         is_shared: false,
       }),
     );
-    dispatch(GetExpenseRequest());
+     
   };
 
   const handleCategoryChange = useCallback(

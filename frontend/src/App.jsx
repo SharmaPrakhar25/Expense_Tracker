@@ -1,20 +1,13 @@
 /* eslint-disable react/jsx-one-expression-per-line */
-import React, { useEffect } from 'react';
+import React from 'react';
 import { ToastContainer } from 'react-toastify';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import Mainpage from './pages/Mainpage';
 import 'react-toastify/dist/ReactToastify.css';
-import { GetExpenseRequest } from './redux/Reducers/GetExpenseSlice';
-
+ 
 function App() {
   const { expense = [] } = useSelector((state) => state.GetExpense);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(GetExpenseRequest());
-  }, [dispatch]);
-
-  // Calculate total amount of expenses
+ 
   const totalAmount = expense.reduce((total, e) => total + e.total_amount, 0);
 
   return (
