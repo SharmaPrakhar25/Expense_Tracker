@@ -18,9 +18,9 @@ model user {
   id           Int            @id @default(autoincrement())
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @default(now())
-  name         String         @db.VarChar(255)
+  name         String?        @db.VarChar(255)
   mobile       String
-  email        String         @db.VarChar(255)
+  email        String?         @db.VarChar(255)
   user_expense user_expense[]
   expense      expense[]
 }

@@ -28,8 +28,8 @@ export async function addUser(req: Request, res: Response) {
 
 export async function fetchUser(req: Request, res: Response) {
   try {
-    const { user_id: userId } = req.body;
-    const user = await fetchUserHelper(userId);
+    const { user_id: userId, mobile } = req.body;
+    const user = await fetchUserHelper(userId, mobile);
     const successResponse: IApiResponse = {
       status: "SUCCESS",
       code: Code.SUCCESS,

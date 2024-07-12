@@ -9,9 +9,9 @@ export const addUser = async (userObj: User) => {
   try {
     return await prisma.user.create({
       data: {
-        name: userObj.name,
+        ...(userObj.name && { name: userObj.name }),
         mobile: userObj.mobile,
-        email: userObj.email,
+        ...(userObj.email && { email: userObj.email }),
       },
     });
   } catch (error) {
@@ -19,7 +19,10 @@ export const addUser = async (userObj: User) => {
   }
 };
 
-export const fetchUser = async (userId: number) => {
+export const fetchUser = async (
+  userId: number | null,
+  mobile: string | null
+) => {
   try {
     return await prisma.user.findFirst({
       select: {
@@ -28,7 +31,10 @@ export const fetchUser = async (userId: number) => {
         mobile: true,
       },
       where: {
-        id: userId,
+        OR: [
+          ...(userId ? [{ id: userId }] : []),
+          ...(mobile ? [{ mobile: mobile }] : []),
+        ],
       },
     });
   } catch (error) {
