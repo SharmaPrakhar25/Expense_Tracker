@@ -1,16 +1,21 @@
 /* eslint-disable import/prefer-default-export */
-// eslint-disable-next-line quotes
-import { takeLatest, call, put } from "redux-saga/effects";
+
+import { takeLatest, call, put } from 'redux-saga/effects';
 // Assuming you have a OtpSlice with appropriate action creators
 import addExpenseAPI from '../index'; // Assuming you have a otpAPI function to make the otp request
-// eslint-disable-next-line quotes
-import { AddExpenseFailure, AddExpenseSuccess } from "../../redux/Reducers/AddExpenseSlice";
+
+import {
+  AddExpenseFailure,
+  AddExpenseSuccess,
+} from '../../redux/Reducers/AddExpenseSlice';
+import { GetExpenseRequest } from '../../redux/Reducers/GetExpenseSlice';
 
 function* handleAddExpense(action) {
   try {
     const expense = yield call(addExpenseAPI, action.payload);
     // Dispatch the otpSuccess action with the user data
     yield put(AddExpenseSuccess(expense.data));
+    yield put(GetExpenseRequest());
     if (!expense.error) {
       yield put(AddExpenseSuccess(expense));
     } else {
@@ -25,6 +30,6 @@ function* handleAddExpense(action) {
 // Watcher saga to listen for login requests
 export function* watchAddExpense() {
   // Take the latest login request action and call handleLogin saga
-  // eslint-disable-next-line quotes
-  yield takeLatest("AddExpense/AddExpenseRequest", handleAddExpense);
+
+  yield takeLatest('AddExpense/AddExpenseRequest', handleAddExpense);
 }
