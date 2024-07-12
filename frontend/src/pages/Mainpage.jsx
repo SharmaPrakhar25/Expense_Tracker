@@ -1,7 +1,6 @@
 import React from 'react';
 import AddExpense from '../components/AddExpense';
-import ExpenseTable from '../components/ExpenseTable';
-import DoughnutChart from '../components/DoughnutChart';
+import Tabs from '../components/Tabs';
 
 function Mainpage() {
   return (
@@ -15,11 +14,7 @@ function Mainpage() {
 
         {/* Left side (Table) */}
         <div className="w-full md:w-4/6 p-4 order-2 md:order-1">
-          <ExpenseTable />
-
-          <div className="flex justify-center">
-            <DoughnutChart />
-          </div>
+          <Tabs />
         </div>
       </div>
     </div>

@@ -13,6 +13,18 @@ export default async function addExpenseAPI(Data) {
     return response.data; // Return response data if needed
   } catch (error) {
     // console.error('Error in AssignStudentDataApi:', error);
-    toast.error('Failed to assign student data'); // Display error toast
+    toast.error(error.message); // Display error toast
   }
 }
+
+export const getExpenseAPI = async (data) => {
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_BACKEND_BASE_URL}/expense/1?${data}`,
+    );
+    // console.log(response.data);
+    return response.data;
+  } catch (error) {
+    toast.error(error.message);
+  }
+};

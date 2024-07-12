@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 export const AddExpenseSlice = createSlice({
-  // eslint-disable-next-line quotes
-  name: "AddExpense",
+
+  name: 'AddExpense',
   initialState: {
-    user: null,
+    data: null,
     isLoading: false,
     error: null,
     isAddExpenseSuccess: false,
@@ -17,7 +17,7 @@ export const AddExpenseSlice = createSlice({
     }),
     AddExpenseSuccess: (state, action) => ({
       isLoading: false,
-      user: action.payload,
+      data: action.payload,
       isAddExpenseSuccess: true,
     }),
     AddExpenseFailure: (state, action) => ({

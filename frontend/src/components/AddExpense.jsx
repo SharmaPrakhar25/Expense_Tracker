@@ -6,25 +6,32 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useDispatch } from 'react-redux';
 import { AddExpenseRequest } from '../redux/Reducers/AddExpenseSlice'; // Update the path to your slice file
+import { GetExpenseRequest } from '../redux/Reducers/GetExpenseSlice';
 
-const MemoizedInput = React.memo(({
-  // eslint-disable-next-line react/prop-types
-  id, label, placeholder, value, onChange,
-}) => (
-  <div className="mb-3">
-    <label className="block text-sm font-medium text-gray-700" htmlFor={id}>
-      {label}
-    </label>
-    <input
-      type="text"
-      id={id}
-      placeholder={placeholder}
-      value={value}
-      onChange={onChange}
-      className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-    />
-  </div>
-));
+const MemoizedInput = React.memo(
+  ({
+    // eslint-disable-next-line react/prop-types
+    id,
+    label,
+    placeholder,
+    value,
+    onChange,
+  }) => (
+    <div className="mb-3">
+      <label className="block text-sm font-medium text-gray-700" htmlFor={id}>
+        {label}
+      </label>
+      <input
+        type="text"
+        id={id}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+      />
+    </div>
+  ),
+);
 
 function AddExpense() {
   const dispatch = useDispatch();
@@ -37,7 +44,9 @@ function AddExpense() {
     // Format date to local timezone date string
     const formatDate = (date) => {
       if (!date) return null;
-      const offsetDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+      const offsetDate = new Date(
+        date.getTime() - date.getTimezoneOffset() * 60000,
+      );
       return offsetDate.toISOString().split('T')[0];
     };
 
@@ -50,9 +59,13 @@ function AddExpense() {
         is_shared: false,
       }),
     );
+    dispatch(GetExpenseRequest());
   };
 
-  const handleCategoryChange = useCallback((e) => setCategory(e.target.value), []);
+  const handleCategoryChange = useCallback(
+    (e) => setCategory(e.target.value),
+    [],
+  );
   const handlePriceChange = useCallback((e) => setPrice(e.target.value), []);
 
   return (
@@ -74,7 +87,9 @@ function AddExpense() {
           onChange={handlePriceChange}
         />
         <div className="mb-3">
-          <label className="block text-sm font-medium text-gray-700">Date</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Date
+          </label>
           <DatePicker
             selected={date}
             onChange={(date) => setDate(date)}
@@ -88,6 +103,7 @@ function AddExpense() {
             }
           />
         </div>
+        <div />
         <div>
           <button
             type="submit"
