@@ -8,10 +8,10 @@ export async function fetchUserExpense(query: FetchExpenseQuery) {
     const { expenseId, userId, sortBy, sortType, category, shared } = query;
     let expenseIdArray: Array<number> = [];
     if (expenseId) {
-      expenseIdArray = [expenseId];
+      expenseIdArray.push(expenseId);
     }
     const whereCondition: any = {
-      AND: [{ owner_user_id: userId }],
+      OR: [{ owner_user_id: userId }],
     };
 
     if (category) {
@@ -39,7 +39,7 @@ export async function fetchUserExpense(query: FetchExpenseQuery) {
     }
 
     if (expenseIdArray.length > 0) {
-      whereCondition.AND.push({
+      whereCondition.OR.push({
         id: {
           in: expenseIdArray,
         },
@@ -76,15 +76,15 @@ export async function addUserExpense(expense: Expense) {
       user: {
         connect: { id: expense.owner_user_id },
       },
-      createdAt: expense.createdAt,
+      ...(expense.createdAt && { createdAt: expense.createdAt }),
       user_expense:
         expense.shared && expense.user_expense
           ? {
-              create: expense.user_expense.map((user) => ({
-                shared_amount: user.shared_amount,
-                user: { connect: { id: user.user_id } },
-              })),
-            }
+            create: expense.user_expense.map((user) => ({
+              shared_amount: user.shared_amount,
+              user: { connect: { id: user.user_id } },
+            })),
+          }
           : undefined,
     };
     console.log("data to save in database", data);

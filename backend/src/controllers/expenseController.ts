@@ -31,7 +31,6 @@ export async function fetchUserExpense(req: Request, res: Response) {
       message: "Expense fetched successfully",
       data: userExpense,
     };
-    console.log(userExpense);
     return res.status(Code.SUCCESS).json(successResponse);
   } catch (error) {
     console.log(error);
@@ -60,7 +59,7 @@ export async function addUserExpense(req: Request, res: Response) {
       owner_user_id: userId,
       category,
       total_amount: amount,
-      shared: isShared,
+      shared: isShared === true,
       user_expense: sharedExpense,
       ...(created_at && { createdAt: new Date(created_at) }),
     };

@@ -4,12 +4,11 @@ import {
   Chart as ChartJS, ArcElement, Tooltip, Legend,
 } from 'chart.js';
 import { useSelector } from 'react-redux';
- 
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function DoughnutChart() {
-   const [chartData, setChartData] = useState({
+  const [chartData, setChartData] = useState({
     labels: [],
     datasets: [
       {
@@ -66,8 +65,6 @@ function DoughnutChart() {
   };
 
   const { expense } = useSelector((state) => state.GetExpense);
-
- 
 
   useEffect(() => {
     processChartData(expense);

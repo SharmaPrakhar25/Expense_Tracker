@@ -19,21 +19,15 @@ const formatDate = (dateString) => {
 
 // Memoized Input Component
 const MemoizedInput = React.memo(
-  ({
-    placeholder, value, onChange, 
-   }) => {
-   
-
-    return (
-      <input
-        type="text"
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-         className="bg-none px-4 py-2 outline-none w-full"
-      />
-    );
-  },
+  ({ placeholder, value, onChange }) => (
+    <input
+      type="text"
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      className="bg-none px-4 py-2 outline-none w-full"
+    />
+  ),
 );
 
 // Memoized Button Component
@@ -51,12 +45,14 @@ const ExpenseTable = React.memo(() => {
   const [category, setCategory] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
   const [dateSortOrder, setDateSortOrder] = useState('asc');
+  const [expandedRows, setExpandedRows] = useState({});
   const dispatch = useDispatch();
 
   const { expense, isLoading, error } = useSelector(
     (state) => state.GetExpense,
   );
 
+  console.log(expense);
   useEffect(() => {
     dispatch(GetExpenseRequest());
   }, [dispatch]);
@@ -79,19 +75,74 @@ const ExpenseTable = React.memo(() => {
     );
   }, [dateSortOrder, dispatch]);
 
+  const handleRowClick = (id) => {
+    setExpandedRows((prevExpandedRows) => ({
+      ...prevExpandedRows,
+      [id]: !prevExpandedRows[id],
+    }));
+  };
+
   const renderedExpenses = useMemo(() => expense && expense.map((e) => (
-    <tr key={e.id} className={e.id % 2 === 0 ? 'bg-white' : 'bg-lime-200'}>
-      <td className="px-4 py-2">{formatDate(e.createdAt)}</td>
-      <td className="px-4 py-2">{formatCategoryName(e.category)}</td>
-      <td className="px-4 py-2">
-        $
-        {e.total_amount}
-      </td>
-    </tr>
-  )), [expense]);
+    <React.Fragment key={e.id}>
+      <tr className={e.id % 2 === 0 ? 'bg-white' : 'bg-lime-200 rounded-full'}>
+        <td className="px-4 py-2">{formatDate(e.createdAt)}</td>
+        <td className="px-4 py-2">{formatCategoryName(e.category)}</td>
+        <td className="px-4 py-2">
+          $
+          {e.total_amount}
+        </td>
+        <td className="px-4 py-2">
+          {e.shared && (
+            <button onClick={() => handleRowClick(e.id)}>
+              {expandedRows[e.id] ? (
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                </svg>
+              )}
+            </button>
+          )}
+        </td>
+      </tr>
+      {expandedRows[e.id] && e.shared && e.user_expense.length > 0 && (
+        <tr className="bg-white">
+          <td colSpan="4" className="px-4 py-2">
+            <table className="w-full table-auto border-collapse overflow-hidden">
+              <thead>
+                <tr className="bg-white">
+                  <th className="px-4 py-2">User Id</th>
+                  <th className="px-4 py-2">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {e.user_expense.map((ue) => (
+                  <tr key={ue.shared_with_user_id} className={e.id % 2 === 0 ? 'bg-white' : 'bg-lime-200'}>
+                    <td className="px-4 py-2">{ue.shared_with_user_id}</td>
+                    <td className="px-4 py-2">{ue.shared_amount}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      )}
+    </React.Fragment>
+  )), [expense, expandedRows]);
 
   if (isLoading) {
     return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return (
+      <p>
+        Error loading expenses:
+        {error.message}
+      </p>
+    );
   }
 
   return (
@@ -103,7 +154,7 @@ const ExpenseTable = React.memo(() => {
             placeholder="Search By Category"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-           />
+          />
           <MemoizedButton onClick={handleSearchData}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -194,13 +245,14 @@ const ExpenseTable = React.memo(() => {
       </div>
 
       <div className="overflow-auto custom-scrollbar rounded-lg shadow-sm ">
-        {expense.length > 0 ? (
+        {expense && expense.length > 0 ? (
           <table className="w-full table-auto border-collapse overflow-hidden">
             <thead>
-              <tr className="bg-gray-100">
+              <tr className="bg-white">
                 <th className="px-4 py-3">Date</th>
                 <th className="px-4 py-3">Category</th>
                 <th className="px-4 py-3">Price</th>
+                <th className="px-4 py-3" />
               </tr>
             </thead>
             <tbody>{renderedExpenses}</tbody>
